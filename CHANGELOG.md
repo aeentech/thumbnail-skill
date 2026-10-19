@@ -3,6 +3,13 @@
 All notable changes to this project are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project follows [Semantic Versioning](https://semver.org/).
 
+## [1.1.0] - 2026-10-19
+
+### Changed
+
+- Lower token usage, roughly half or less per thumbnail, with the same design quality. The workflow now runs in fewer turns: inspection, extraction and the history check run as one command, and the design is written and rendered in a single step.
+- Extraction now writes `overview.png`, a labelled contact sheet of every capture. The agent reviews the whole identity kit in one view, then opens only the assets it chose at full size.
+
 ## [1.0.0] - 2026-10-19
 
 ### Added
@@ -17,4 +24,5 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Local project support, which temporarily runs the project's dev server.
 - Compatibility with any agent that supports Agent Skills.
 
+[1.1.0]: https://github.com/aeentech/thumbnail-skill/releases/tag/v1.1.0
 [1.0.0]: https://github.com/aeentech/thumbnail-skill/releases/tag/v1.0.0

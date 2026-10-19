@@ -29,7 +29,7 @@ Paths are relative to this skill's directory (the folder that contains this file
 | Script | Purpose |
 |---|---|
 | `inspect.mjs <url\|file>` | JSON summary: page type (site / article) and article metadata, title, description, language and direction, headings, navigation, text sample, logo and icon candidates, brand colors, fonts. |
-| `extract.mjs <url\|file> --out <dir>` | Identity kit: `hero.png`, page `sections/*.png`, distinctive `elements/*.png` at 2x (hero visual, card groups and cards, code, illustrations, media, header, footer), original `images/*`, the site's `fonts/` and `fonts.css`, and `extract.json` (design tokens, element and image index, code text). |
+| `extract.mjs <url\|file> --out <dir>` | Identity kit: `overview.png` (a labelled contact sheet of every capture), `hero.png`, page `sections/*.png`, distinctive `elements/*.png` at 2x (hero visual, card groups and cards, code, illustrations, media, header, footer), original `images/*`, the site's `fonts/` and `fonts.css`, and `extract.json` (design tokens, element and image index, code text). |
 | `extract.mjs <url\|file> --out <dir> --selector "<css>" --name <name> [--transparent]` | Capture one specific element at 2x into `<dir>/elements/<name>.png`. |
 | `screenshot.mjs <url\|file> --out <file.png> [--width --height --scale --wait]` | Clean viewport screenshot with cookie banners and chat widgets hidden. |
 | `render.mjs <file.html> [--out <file.png>]` | Render a composition at 2x to PNG and lossless WebP. Reads the canvas size from the page and reports loaded fonts, failed fonts, broken images and overflowing text. |
@@ -76,6 +76,8 @@ The sentence, category and any extra text are written in the chosen language.
 
 ## Workflow
 
+**Work in few turns.** Every turn re-reads the whole conversation, so the number of turns drives the cost far more than any single file. Batch independent commands into one shell call, read independent files in parallel in the same turn, and never re-read a file or image you have already seen.
+
 ### 1. Make the target reachable
 
 - **URL mode:** use the URL.
@@ -83,39 +85,46 @@ The sentence, category and any extra text are written in the chosen language.
 - **Framework project** (a `package.json` with `dev`, `start` or `preview`): install dependencies if `node_modules` is missing, using the package manager that matches the lockfile. Start the dev server in the background, read its port from the output, and wait until `curl -s -o /dev/null -w "%{http_code}" <url>` responds. Stop the server once extraction is done.
 - **Cannot run:** use a deployed URL from `package.json` (`homepage`) or the README. If there is none, build from the project's own assets (images, components, styles) and tell the user.
 
-### 2. Inspect and extract
+### 2. Inspect, extract and check history (one command)
+
+Run all three in a single shell call:
 
 ```
-node $S/inspect.mjs <url> > <out>/inspect.json
-node $S/extract.mjs <url> --out <out>/extract
+mkdir -p <out> && node $S/inspect.mjs <url> > <out>/inspect.json && node $S/extract.mjs <url> --out <out>/extract && node $S/history.mjs
 ```
 
-### 3. Understand the content
+If `inspect.json` shows the page is an article, rename the folder to `./thumbnail-<domain>-<slug>/` in your next shell call.
+
+### 3. Understand the content and study the identity (one turn)
+
+In the same turn, read the key fields of `inspect.json` (print them with a short script rather than the whole file) and view `extract/overview.png`. The overview is a contact sheet of every capture (hero, sections, elements, images), each labelled with its file name.
+
+**Content**
 
 - **Site:** what is it, who is it for, what does it offer, and what makes it feel like itself? Use `inspect.json`, `extract.json` and, in project mode, the README, `package.json`, landing and hero components, locale files, meta tags, manifest and styles.
 - **Article:** what is the article about, and what will the reader get from it? Use `page.article` (headline, description, section, tags, author, date, reading time, subheadings, cover image, in-article images, code blocks) and the article text.
 - If the page text is thin (a client-rendered page or a bot wall), fetch it another way, for example with a web-fetch tool or `curl`.
 
-### 4. Study the identity
-
-Look at `extract/hero.png`, every `extract/sections/*.png`, the `extract/elements/*.png` crops and the larger `extract/images/*`. For an article, also look at the cover image. Note:
+**Identity**: from the overview (plus the cover image for an article), note:
 
 - **Mood and style:** photographic, 3D, flat illustration, luxury, playful, technical, editorial, minimal…
 - **Signature elements:** the two to four things people recognize the site by, for example a hero image or object, a distinctive card or product tile, a motif, a code sample, an icon set, a gradient, a typographic treatment.
 - **Tokens:** colors, page background, button colors, radii, shadows, gradients, heading style, and badge or button style.
 
-If a part you need wasn't detected, capture it with `extract.mjs --selector`.
-
-### 5. Choose the composition
+### 4. Choose the composition
 
 **If the user explicitly asks for a composition, use it.** This applies when the user names one (for example "Component Collage") or clearly describes its idea, in any language (for example "a collage of the site's cards" or "a grid of its features"). Use that composition even if it was used recently, and skip the history check. Their other notes still apply.
 
 Otherwise, choose it yourself:
 
-1. Run `node $S/history.mjs` to see recent compositions.
+1. Use the history printed in step 2.
 2. Read `$SKILL_DIR/references/compositions.md` and choose the composition that best expresses this site's signature elements.
 3. Avoid the compositions used in the last two runs unless nothing else fits.
 4. Write `<out>/brief.md`. Keep it short: identity keywords, signature elements and the files you'll use, the chosen composition and why, and a one-line layout sketch.
+
+### 5. Open the chosen assets at full size (one turn)
+
+The overview is for choosing, not for detail. Once you know which two to four assets the design will use (and the logo), open them at full resolution, all in parallel in one turn, to check small text, fine motifs and crispness before designing. If a part you need wasn't detected, capture it with `extract.mjs --selector` in the same turn.
 
 ### 6. Write the content
 
@@ -159,7 +168,7 @@ Otherwise, choose it yourself:
    - `data-fit="3"` on the sentence shrinks it until it fits in three lines. `data-min` sets the smallest size (24px by default).
    - `data-text="<name>"` on text elements lets the renderer report overflow.
 5. Keep the file neutral: no comments, and nothing that describes how or with what it was made.
-6. Render it: `node $S/render.mjs <out>/<name>.html`. This writes `<name>.png` and `<name>.webp`.
+6. Write the file and render it in the same shell call, for example `cat > <out>/<name>.html <<'EOF' … EOF && node $S/render.mjs <out>/<name>.html`. This writes `<name>.png` and `<name>.webp`.
 
 **Craft standards**
 - A clear hierarchy: subject, then sentence, then logo and category.
@@ -177,8 +186,8 @@ Otherwise, choose it yourself:
    - Is the text correct: connected Arabic letters, right-to-left order where needed, three lines at most?
    - Are there blurry upscaled crops, or anything important too close to the edges?
    - Did the renderer report broken images, overflowing text or failed fonts?
-2. Fix any issues and render again, up to three times.
-3. Record the composition: `node $S/history.mjs add <site-or-project> "<Composition>"`.
+2. Fix every issue you noticed in one edit, then render again in the same call. Repeat up to three times.
+3. Record the composition, chained to the final render if you like: `node $S/history.mjs add <site-or-project> "<Composition>"`.
 4. Deliver the image with the final reply described under *Communication*.
 
 ## Editing after delivery

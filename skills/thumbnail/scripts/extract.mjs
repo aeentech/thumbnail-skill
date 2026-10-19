@@ -12,6 +12,7 @@
 //   images/*                 the largest real images used by the page (originals, downloaded)
 //   fonts/* + fonts.css      the page's own @font-face files (same-origin sheets) rewritten to local paths
 //   extract.json             design tokens + an index of everything above
+//   overview.png             contact sheet of all captures (labelled with their file names) for a single-view review
 //
 // Selector mode captures one specific element (first match) @2x into <dir>/elements/<name>.png.
 import { writeFileSync, mkdirSync, existsSync } from 'node:fs';
@@ -243,7 +244,30 @@ try {
     data.fonts = { used: f.used, google: f.google, fontsCss: css.length ? 'fonts.css' : null, faceCount: css.length };
     for (const e of data.elements) delete e.id;
     writeFileSync(join(out, 'extract.json'), JSON.stringify(data, null, 2));
-    console.log(JSON.stringify({ out, sections: data.sections.length, elements: data.elements.filter(e => e.file).length, images: data.images.filter(i => i.file).length, fontFaces: css.length }));
+
+    // Contact sheet: every capture on one labelled image, so the whole kit can be reviewed in a single view.
+    const tiles = [
+      { file: 'hero.png', label: 'hero' },
+      ...data.sections.map((x) => ({ file: x.file, label: x.file.replace('sections/', '') })),
+      ...data.elements.filter((e) => e.file).map((e) => ({ file: e.file, label: e.file.replace('elements/', '') })),
+      ...data.images.filter((i) => i.file && !/\.svg$/i.test(i.file)).map((i) => ({ file: i.file, label: i.file.replace('images/', '').slice(0, 34) })),
+    ];
+    const esc = (t) => t.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+    const sheet = `<!doctype html><html><head><meta charset="utf-8"><style>
+      body{margin:0;background:#1d1d21;font:12px/1.3 -apple-system,Segoe UI,Arial,sans-serif;color:#ddd}
+      .g{display:grid;grid-template-columns:repeat(5,300px);gap:10px;padding:10px;width:1560px}
+      .t{background:#2a2a30;border-radius:6px;overflow:hidden}
+      .t div{height:190px;background:#fff center/contain no-repeat}
+      .t p{margin:0;padding:5px 7px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    </style></head><body><div class="g">${tiles.map((t) => `<div class="t"><div style="background-image:url('${encodeURI(t.file)}')"></div><p>${esc(t.label)}</p></div>`).join('')}</div></body></html>`;
+    writeFileSync(join(out, 'overview.html'), sheet);
+    await page.setViewport({ width: 1580, height: 900, scale: 1 });
+    await page.goto(pathToFileURL(join(out, 'overview.html')).href);
+    await sleep(600);
+    const sheetH = await page.evaluate('document.documentElement.scrollHeight');
+    writeFileSync(join(out, 'overview.png'), await page.capture({ x: 0, y: 0, width: 1580, height: sheetH }));
+
+    console.log(JSON.stringify({ out, overview: 'overview.png', sections: data.sections.length, elements: data.elements.filter(e => e.file).length, images: data.images.filter(i => i.file).length, fontFaces: css.length }));
   }
 } finally {
   await browser.close();

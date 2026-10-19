@@ -48,7 +48,7 @@ Text and key content stay inside each platform's safe zone.
 ## How it works
 
 1. **Understands the target.** It reads the page copy, meta tags and structure. For a local project, it also reads the README and locale files. From these it works out what the site is, who it's for and what it offers.
-2. **Extracts the identity.** It captures the hero and page sections and crops distinctive elements: cards, code, illustrations and media. It downloads the original images and the site's own font files, and records its design tokens: colors, radii, shadows, gradients, and button and heading styles.
+2. **Extracts the identity.** It captures the hero and page sections and crops distinctive elements: cards, code, illustrations and media. Everything is collected on one labelled overview sheet, so the agent can review it in a single view. It downloads the original images and the site's own font files, and records its design tokens: colors, radii, shadows, gradients, and button and heading styles.
 3. **Art-directs.** It picks the composition that best fits the site's signature elements, and avoids repeating recent ones. The nine compositions are Hero Scene, Component Collage, Typographic Poster, Product Showcase, Code & Terminal, Device Frame, Pattern & Motif, Split Editorial and Feature Grid.
 4. **Builds and reviews.** It writes the composition in HTML/CSS with the real logo, a category label and a one-line pitch. Then it renders the image, checks the result and refines it.
 
@@ -177,6 +177,7 @@ Ask for changes such as "shorter sentence", "try another composition", "make a s
 | Export | 2x resolution, PNG and lossless WebP |
 | Metadata | none; image data only |
 | Rendering | headless Chromium through the DevTools Protocol |
+| Efficiency | a short workflow with few agent turns, to keep token usage low |
 | Fonts | the site's own font, with Noto Sans Arabic and Noto Sans as fallbacks |
 
 ## Privacy and assets
