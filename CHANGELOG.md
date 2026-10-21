@@ -3,6 +3,12 @@
 All notable changes to this project are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project follows [Semantic Versioning](https://semver.org/).
 
+## [1.1.1] - 2026-10-21
+
+### Fixed
+
+- Large Arabic headings no longer touch the elements around them. `canvas.html` gives `[data-fit]` text a line height of 1.45 with a little vertical padding, and the composition rules ask for space after large Arabic headings and a check in the render.
+
 ## [1.1.0] - 2026-10-19
 
 ### Changed

@@ -17,6 +17,8 @@
     font-family: var(--font, "Noto Sans Arabic", "Noto Sans", sans-serif);
   }
   img { display: block; }
+  /* Large Arabic text: ascenders and descenders reach outside a tight line box, so keep room around headings. */
+  [dir="rtl"] [data-fit] { line-height: 1.45; padding-block: 0.08em; }
 
   :root {
     --font: "Noto Sans Arabic", "Noto Sans", sans-serif;

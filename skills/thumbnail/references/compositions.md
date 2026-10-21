@@ -94,6 +94,7 @@ The site's key features, steps or real numbers as a compact bento of tiles, styl
 - **Identity first.** Font, colors, radii, shadows, badge and button style, and imagery mood all come from the site.
 - **One focal point.** A clear hierarchy: subject, then sentence, then logo and category.
 - **Legibility.** The sentence fits in three lines (`data-fit="3"`), with at least 4.5:1 contrast against what is behind it; add a scrim if needed. Keep 56–72px clear of every edge, plus the platform safe zone on vertical formats.
+- **Arabic display text.** Large Arabic headings need a line height of at least 1.45 and some space before the next element, because ascenders and descenders (ج، ؤ، ل) reach outside a tight line box and touch chips or cards placed next to them. `canvas.html` sets this for `[data-fit]`; keep it when overriding the sentence style. Check it in the render, since box checks do not see glyphs.
 - **Real visuals beat redraws.** When a signature visual only exists inside a capture, crop it with CSS (`background-size` and `background-position`) and soften the edges with `mask-image` rather than recreating it.
 - **Crispness.** Element crops are 2x. Don't show a bitmap at more than about 1.3× its natural size; use another asset or rebuild it in HTML/CSS.
 - **Direction.** Right-to-left languages start from the right; left-to-right languages from the left.
